@@ -4320,63 +4320,26 @@ init_start_bidir_done:
 ;	call	calc_next_comm_timing
 ;	call	initialize_timing			; Initialize timing
 
-    ; Clear rc pulse reverse cmd
-    clr Flags2.RCP_DIR_REV
-
-    ; If no bidirectional operation force first direction reconfiguration
-    jnb Flags3.PGM_BIDIR, run1_dir_update
-
-
 ;**** **** **** **** **** **** **** **** **** **** **** **** ****
 ;
 ; Run entry point
 ;
 ;**** **** **** **** **** **** **** **** **** **** **** **** ****
 
-; Run 1 = B(p-on) + C(n-pwm) - comparator A evaluated
-; Out_cA changes from low to high
 run1:
-    jnb Flags3.PGM_BIDIR, run1_dir_updated
+    call wait200ms
+    call comm1comm2         ; Commutate
+    call wait200ms
+    call comm2comm3         ; Commutate
+    call wait200ms
+    call comm3comm4         ; Commutate
+    call wait200ms
+    call comm4comm5         ; Commutate
+    call wait200ms
+    call comm5comm6         ; Commutate
+    call wait200ms
+    call comm6comm1         ; Commutate
 
-run1_dir_update:
-    jb  Flags3.PGM_DIR_REV, run1_dir_reverse
-
-run1_dir_forward:
-    jb  Flags2.RCP_DIR_REV, run1_dir_do_reverse
-
-run1_dir_do_forward:
-    clr IE_EA               ; Disable all interrupts
-IF USE_PHASES_AB == 1
-    BcomFET_on
-    Set_Pwm_A
-ELSEIF USE_PHASES_BC == 1
-    CcomFET_on
-    Set_Pwm_B
-ELSEIF USE_PHASES_CA == 1
-    AcomFET_on
-    Set_Pwm_C
-ENDIF
-    setb IE_EA
-    jmp run1_dir_updated
-
-run1_dir_reverse:
-    jb  Flags2.RCP_DIR_REV, run1_dir_do_forward
-
-run1_dir_do_reverse:
-    clr IE_EA               ; Disable all interrupts
-IF USE_PHASES_AB == 1
-    AcomFET_on
-    Set_Pwm_B
-ELSEIF USE_PHASES_BC == 1
-    BcomFET_on
-    Set_Pwm_C
-ELSEIF USE_PHASES_CA == 1
-    CcomFET_on
-    Set_Pwm_A
-ENDIF
-    setb IE_EA
-
-run1_dir_updated:
 
 ;	call wait_for_comp_out_high	; Wait for high
 ;;		setup_comm_wait		; Setup wait time from zero cross to commutation
