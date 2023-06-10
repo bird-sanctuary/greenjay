@@ -4346,8 +4346,16 @@ run1_dir_forward:
 
 run1_dir_do_forward:
     clr IE_EA               ; Disable all interrupts
+IF USE_PHASES_AB == 1
     BcomFET_on
     Set_Pwm_A
+ELSEIF USE_PHASES_BC == 1
+    CcomFET_on
+    Set_Pwm_B
+ELSEIF USE_PHASES_CA == 1
+    AcomFET_on
+    Set_Pwm_C
+ENDIF
     setb IE_EA
     jmp run1_dir_updated
 
@@ -4356,8 +4364,16 @@ run1_dir_reverse:
 
 run1_dir_do_reverse:
     clr IE_EA               ; Disable all interrupts
+IF USE_PHASES_AB == 1
     AcomFET_on
     Set_Pwm_B
+ELSEIF USE_PHASES_BC == 1
+    BcomFET_on
+    Set_Pwm_C
+ELSEIF USE_PHASES_CA == 1
+    CcomFET_on
+    Set_Pwm_A
+ENDIF
     setb IE_EA
 
 run1_dir_updated:
